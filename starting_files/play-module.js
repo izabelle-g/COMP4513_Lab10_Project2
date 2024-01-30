@@ -3,26 +3,24 @@ class Play{
      * @param {string} title Title of the play
      * @param {string} short The short version of the title
      * @param {array} persona The roles in the play and who are they played
-     * @param {Act} act The acts available in the play    
+     * @param {Act} acts The acts available in the play    
      */
-    constructor(playTitle, short, persona, act){
+    constructor(playTitle, short, persona, acts){
         this.playTitle = playTitle;
         this.short = short;
         this.persona = persona;
-        this.act = act;
+        this.acts = acts;
     }
-
-    // TODO: maybe add in a get position, player, desc
 }
 
 class Act{
     /**
      * @param {string} name The name of the Act
-     * @param {Scene} scene The scenes within the Act
+     * @param {Scene} scenes The scenes within the Act
      */
-    constructor(actName, scene){
+    constructor(actName, scenes){
         this.actName = actName;
-        this.scene = scene;
+        this.scenes = scenes;
     }
 }
 
@@ -39,6 +37,4 @@ class Scene{
         this.stageDir = stageDir;
         this.speech = speech;
     }
-
-    // TODO: stage direction can be empty so figure out how to make sure that doesn't breaks or something
 }
