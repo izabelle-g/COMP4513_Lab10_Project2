@@ -19,12 +19,8 @@ document.addEventListener("DOMContentLoaded", function() {
          // Data is in JS, to string = JSON.stringify(data);  
          // If JSON to JS obj = JSON.parse(data);
          const playData = data;
-         
-         const actsData = playData.acts;
-         
-         //TODO: I need a for loop for this like for a of acts then another for loop for s of a
-         const scenesData = actsData.scene;
-         console.log(actsData);
+
+         toDataList(playData);
       })
       .catch(err => {}); 
       });
@@ -37,10 +33,25 @@ document.addEventListener("DOMContentLoaded", function() {
     */
 });
 
-function toObjects(playData){
-   const actsData = playData.acts;
+// returns whatever list data you need
+function toDataList(jsonData){
+   let dataList = [];
 
-   //TODO: scene object
-   //TODO: act object
-   //TODO: play object
+   for(const k of Object.keys(jsonData)){
+      if(k == "acts"){
+         dataList = jsonData.acts;
+         break; // get out of the loop
+      } else if(k == "scenes"){
+         for(const j of jsonData){
+            for(const s of j.scenes){
+               dataList.push(s);
+
+               break; // get out of the loop
+            }
+         }
+         break; 
+      }
+   }
+    
+   return dataList;
 }
