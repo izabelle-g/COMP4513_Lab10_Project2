@@ -1,4 +1,5 @@
-
+// when you're using modules, you need to add the import and export lines
+import { Play, Act, Scene } from "./play-module.js";
 
 document.addEventListener("DOMContentLoaded", function() {
 	
@@ -18,40 +19,93 @@ document.addEventListener("DOMContentLoaded", function() {
       .then(data => {
          // Data is in JS, to string = JSON.stringify(data);  
          // If JSON to JS obj = JSON.parse(data);
-         const playData = data;
+         const curPlay = toPlayObject(data);
 
-         toDataList(playData);
-      })
-      .catch(err => {}); 
-      });
+         const selectAct = document.querySelector("#interface #actList");
+         const selectScene = document.querySelector("#interface #sceneList");
 
+         // populate Act select
+         populateSelect(selectAct, curPlay.acts);
 
-    /* note: you may get a CORS error if you test this locally (i.e., directly from a
-       local file). To work correctly, this needs to be tested on a local web server.  
-       Some possibilities: if using Visual Code, use Live Server extension; if Brackets,
-       use built-in Live Preview.
-    */
+         // select Act
+         selectAct.addEventListener("change", function() {
+            const act = selectAct.value;
+
+            // populate Scene select
+            for(const a of curPlay.acts){
+               if(a.name == act){
+                  populateSelect(selectScene, a.scenes);
+               }
+            }
+         }); // ***
+      }) // **
+      .catch(err => { "Fetch Failed" }); 
+   }); // *
 });
 
-// returns whatever list data you need
-function toDataList(jsonData){
-   let dataList = [];
 
-   for(const k of Object.keys(jsonData)){
-      if(k == "acts"){
-         dataList = jsonData.acts;
-         break; // get out of the loop
-      } else if(k == "scenes"){
-         for(const j of jsonData){
-            for(const s of j.scenes){
-               dataList.push(s);
+/**
+ * Converts the contents of the JSON data into a JS Play Object
+ * @param {*} jsonData the data from the API
+ * @returns            a Play object
+ */
+function toPlayObject(jsonData){
+   const actsData = jsonData.acts;
+   const playActs = [];
+   let actScenes = [];
+   let scene;
+   let act;
 
-               break; // get out of the loop
-            }
-         }
-         break; 
+   // creating new scene and acts objects
+   for(const a of actsData){
+      // clear actScenes of new Act
+      actScenes = [];
+      
+      // create new Scene Object and add to scene list of current Act
+      for(const s of a.scenes){
+         scene = new Scene(s.name, s.title, s.stageDirection, s.speeches);
+         actScenes.push(scene);
       }
+      
+      // create new Act Object and add to acts list of current Play
+      act = new Act(a.name, actScenes);
+      playActs.push(act);
    }
-    
-   return dataList;
+
+   return new Play(jsonData.title, jsonData.short, jsonData.persona, playActs);
+}
+
+
+/**
+ * Populates a select element dynamically
+ * @param {*} select the specific select element we would like to populate
+ * @param {*} list   the array from which we want to pull the items from
+ * @desc             the clear select code snippet is from w3schools tutorial
+ */
+function populateSelect(select, list){
+   // clear select
+   while(select.hasChildNodes()){
+      select.removeChild(select.firstChild);
+   }
+
+   const msgOpt = document.createElement("option");
+   msgOpt.value = "0";
+   if(select.id == "actList"){
+      msgOpt.innerHTML = "Choose an Act";
+   } else if(select.id == "sceneList"){
+      msgOpt.innerHTML = "Choose a Scene";
+   }
+   select.appendChild(msgOpt);
+
+   // populate the rest of the select
+   for(const l of list){
+      const opt = document.createElement("option");
+      opt.value = l.name;
+      opt.innerHTML = l.name;
+      select.appendChild(opt);
+   }
+}
+
+function display(play){
+   const 
 }

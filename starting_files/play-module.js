@@ -18,23 +18,25 @@ class Act{
      * @param {string} name The name of the Act
      * @param {array} scenes The scenes within the Act
      */
-    constructor(actName, scenes){
-        this.actName = actName;
+    constructor(name, scenes){
+        this.name = name;
         this.scenes = scenes;
     }
 }
 
 class Scene{
     /**
-     * @param {string} sceneName The name of the scene
+     * @param {string} name The name of the scene
      * @param {string} sceneTitle The title of the scene
      * @param {string} stageDir The stage direction
      * @param {array} speeches The speeches within the Scene
      */
-    constructor(sceneName, sceneTitle, stageDir, speeches){
-        this.sceneName = sceneName;
+    constructor(name, sceneTitle, stageDir, speeches){
+        this.name = name;
         this.sceneTitle = sceneTitle;
         this.stageDir = stageDir;
         this.speeches = speeches;
     }
 }
+
+export { Play, Act, Scene };
