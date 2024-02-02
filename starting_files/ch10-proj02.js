@@ -47,11 +47,16 @@ document.addEventListener("DOMContentLoaded", function() {
                            updateScene(s);
                            populatePlayers(s);
 
-                           selectPlayer.addEventListener("change", function() {
+                           selectPlayer.addEventListener("change", function(){
                               const player = selectPlayer.value;
-                              //const btn = document.querySelector("#btnHighLight");
-                           
-                              playerScenes(player, s);
+                              const text = document.querySelector("#txtHighlight");
+                              const btn = document.querySelector("#btnHighlight");
+                              
+                              btn.addEventListener("click", function(){
+                                 const search = text.value; 
+                                 playerScenes(player, s);
+                                 searchLines(search, player, s);
+                              });
                            });
                         }
                      }
@@ -233,6 +238,10 @@ function populatePlayers(curScene){
    const selectPlayer = document.querySelector("#playerList");
    const playerList = [];
 
+   while(selectPlayer.childNodes.length > 2){
+      selectPlayer.removeChild(selectPlayer.lastChild);
+   }
+
    for(const p of curScene.speeches){
       if(!(playerList.includes(p.speaker))){
          playerList.push(p.speaker);
@@ -250,7 +259,6 @@ function playerScenes(player, curScene){
    const scene = document.querySelector("#sceneHere h4");
    const title = document.querySelector("#sceneHere .title");
    const stageDir = document.querySelector("#sceneHere .direction");
-   let playerSpeeches = [];
 
    clear();
 
@@ -259,10 +267,63 @@ function playerScenes(player, curScene){
    stageDir.textContent = curScene.stageDir;
 
    for(const p of curScene.speeches){
+      const div = document.createElement("div");
+      div.className = "speech";
+
       if(p.speaker == player){
-        playerSpeeches.push(p.lines);
+         const span = document.createElement("span");
+         span.textContent = p.speaker;
+         div.appendChild(span);
+         for(const l of p.lines){
+            const para = document.createElement("p");
+            para.textContent = l;
+            div.appendChild(para);
+         }
+
+         if(Object.hasOwn(p, "stagedir")){
+            const em = document.createElement("em");
+            em.textContent = p.stagedir;
+            div.appendChild(em);
+         }
       }
+
+      sceneInfo.appendChild(div);
    }
-   console.log(playerSpeeches);
-   //populateSpeeches(playerSpeeches, sceneInfo);
+}
+
+function searchLines(search, curPlayer, curScene){
+   const sceneInfo = document.querySelector("#sceneHere");
+   const scene = document.querySelector("#sceneHere h4");
+   const title = document.querySelector("#sceneHere .title");
+   const stageDir = document.querySelector("#sceneHere .direction");
+
+   clear();
+
+   scene.textContent = curScene.name;
+   title.textContent = curScene.sceneTitle;
+   stageDir.textContent = curScene.stageDir;
+
+   for(const p of curScene.speeches){
+      const div = document.createElement("div");
+      div.className = "speech";
+      if(p.speaker == curPlayer){
+         for(const l of p.lines){
+            if(l.includes(search)){
+               const span = document.createElement("span");
+               span.textContent = p.speaker;
+               div.appendChild(span);
+               const para = document.createElement("p");
+               para.innerHTML = l.replace(search, '<b>' + search + '</b>');
+               div.appendChild(para);
+            }
+         }
+
+         if(Object.hasOwn(p, "stagedir")){
+            const em = document.createElement("em");
+            em.textContent = p.stagedir;
+            div.appendChild(em);
+         }
+      }
+      sceneInfo.appendChild(div);
+   }
 }
