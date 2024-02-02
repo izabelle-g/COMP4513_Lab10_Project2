@@ -20,9 +20,11 @@ document.addEventListener("DOMContentLoaded", function() {
          // Data is in JS, to string = JSON.stringify(data);  
          // If JSON to JS obj = JSON.parse(data);
          const curPlay = toPlayObject(data);
+         initialDisplay(curPlay);
 
          const selectAct = document.querySelector("#interface #actList");
          const selectScene = document.querySelector("#interface #sceneList");
+         const selectPlayer = document.querySelector("#interface #playerList");
 
          // populate Act select
          populateSelect(selectAct, curPlay.acts);
@@ -30,14 +32,35 @@ document.addEventListener("DOMContentLoaded", function() {
          // select Act
          selectAct.addEventListener("change", function() {
             const act = selectAct.value;
-
+         
             // populate Scene select
             for(const a of curPlay.acts){
                if(a.name == act){
+                  updateAct(a);
                   populateSelect(selectScene, a.scenes);
+
+                  selectScene.addEventListener("change", function(){
+                     const scene = selectScene.value;
+         
+                     for(const s of a.scenes){
+                        if(s.name == scene){
+                           updateScene(s);
+                           populatePlayers(s);
+
+                           selectPlayer.addEventListener("change", function() {
+                              const player = selectPlayer.value;
+                              //const btn = document.querySelector("#btnHighLight");
+                           
+                              playerScenes(player, s);
+                           });
+                        }
+                     }
+                  });
                }
             }
          }); // ***
+
+        
       }) // **
       .catch(err => { "Fetch Failed" }); 
    }); // *
@@ -106,6 +129,140 @@ function populateSelect(select, list){
    }
 }
 
-function display(play){
-   const 
+/**
+ * Populates the side view of the site with the first scene of the first act
+ * @param {*} curPlay 
+ */
+function initialDisplay(curPlay){
+   const playInfo = document.querySelector("#playHere");
+   const actInfo = document.querySelector("#actHere");
+   const sceneInfo = document.querySelector("#sceneHere");
+
+   const h2 = document.createElement("h2");
+   h2.textContent = curPlay.playTitle;
+   playInfo.insertBefore(h2, playInfo.children[0]);
+
+   const h3 = document.createElement("h3");
+   h3.textContent = curPlay.acts[0].name;
+   actInfo.insertBefore(h3, actInfo.children[0]);
+
+   const sceneOne = curPlay.acts[0].scenes[0];
+   const h4 = document.createElement("h4");
+   h4.textContent = sceneOne.name;
+   sceneInfo.appendChild(h4);
+
+   const title = document.createElement("p");
+   title.className = "title";
+   title.textContent = sceneOne.sceneTitle;
+   sceneInfo.appendChild(title);
+
+   const stageDir = document.createElement("p");
+   stageDir.className = "direction";
+   stageDir.textContent = sceneOne.stageDir;
+   sceneInfo.appendChild(stageDir);
+
+   populateSpeeches(sceneOne, sceneInfo);
+}
+
+function updateAct(curAct){
+   const title = document.querySelector("#actHere h3");
+   title.textContent = curAct.name;
+
+   clear();
+}
+
+function updateScene(curScene){
+   const sceneInfo = document.querySelector("#sceneHere");
+   const scene = document.querySelector("#sceneHere h4");
+   const title = document.querySelector("#sceneHere .title");
+   const stageDir = document.querySelector("#sceneHere .direction");
+   
+   clear();
+   
+   scene.textContent = curScene.name;
+   title.textContent = curScene.sceneTitle;
+   stageDir.textContent = curScene.stageDir;
+
+   populateSpeeches(curScene, sceneInfo);
+}
+
+function populateSpeeches(curScene, sceneInfo){
+   // for all speeches in scene one
+   for(const s of curScene.speeches){
+      const div = document.createElement("div");
+      const span = document.createElement("span");
+      
+      div.className = "speech";
+      span.textContent = s.speaker;
+      div.appendChild(span);
+
+      // for all the lines
+      for(const l of s.lines){
+         const p = document.createElement("p");
+         p.textContent = l;
+         div.appendChild(p);
+      }
+
+      if(Object.hasOwn(s, "stagedir")){
+         const em = document.createElement("em");
+         em.textContent = s.stagedir;
+         div.appendChild(em);
+      }
+      sceneInfo.appendChild(div);
+   }
+}
+
+function clear(){
+   // clears the displayed speeches
+   const speeches = document.querySelectorAll("#sceneHere .speech");
+   for(const s of speeches){
+      s.remove();
+   }
+
+   const h4 = document.querySelector("#sceneHere h4");
+   h4.textContent = "";
+
+   const sceneTitle = document.querySelector("#sceneHere .title");
+   sceneTitle.textContent = "";
+
+   const stageDir = document.querySelector("#sceneHere .direction");
+   stageDir.textContent = "";
+}
+
+function populatePlayers(curScene){
+   const selectPlayer = document.querySelector("#playerList");
+   const playerList = [];
+
+   for(const p of curScene.speeches){
+      if(!(playerList.includes(p.speaker))){
+         playerList.push(p.speaker);
+
+         const opt = document.createElement("option");
+         opt.value = p.speaker;
+         opt.innerHTML = p.speaker;
+         selectPlayer.appendChild(opt);
+      }
+   }
+}
+
+function playerScenes(player, curScene){
+   const sceneInfo = document.querySelector("#sceneHere");
+   const scene = document.querySelector("#sceneHere h4");
+   const title = document.querySelector("#sceneHere .title");
+   const stageDir = document.querySelector("#sceneHere .direction");
+   let playerSpeeches = [];
+
+   clear();
+
+   scene.textContent = curScene.name;
+   title.textContent = curScene.sceneTitle;
+   stageDir.textContent = curScene.stageDir;
+
+   for(const p of curScene.speeches){
+      if(p.speaker == player){
+        playerSpeeches.push(p.lines);
+      }
+   }
+   console.log(playerSpeeches);
+   //populateSpeeches(playerSpeeches, sceneInfo);
 }

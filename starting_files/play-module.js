@@ -1,6 +1,6 @@
 class Play{
     /**
-     * @param {string} title Title of the play
+     * @param {string} playTitle Title of the play
      * @param {string} short The short version of the title
      * @param {array} persona The roles in the play and who are they played
      * @param {array} acts The acts available in the play    
