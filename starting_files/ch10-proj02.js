@@ -307,15 +307,18 @@ function searchLines(search, curPlayer, curScene){
       const div = document.createElement("div");
       div.className = "speech";
       if(p.speaker == curPlayer){
+         const span = document.createElement("span");
+         span.textContent = p.speaker;
+         div.appendChild(span);
          for(const l of p.lines){
+            const para = document.createElement("p");
             if(l.includes(search)){
-               const span = document.createElement("span");
-               span.textContent = p.speaker;
-               div.appendChild(span);
-               const para = document.createElement("p");
                para.innerHTML = l.replace(search, '<b>' + search + '</b>');
-               div.appendChild(para);
             }
+            else{
+               para.textContent = l;
+            }
+            div.appendChild(para);
          }
 
          if(Object.hasOwn(p, "stagedir")){
